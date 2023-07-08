@@ -42,6 +42,7 @@ public class Batch {
                 coupons = new HashMap<Integer, Coupon>();
                 var c = couponSet.iterator().next();
                 for(int i=0;i<maxAllowedGrants;i++) {
+                    c.setId(i);
                     coupons.put(i,c );
                 }
             }
@@ -59,7 +60,8 @@ public class Batch {
 
     public Coupon grantCoupon() throws CouponManagementException {
 
-        Coupon res = null;
+        Integer res = null;
+        Coupon cToRet = null;
         if(this.getEndTime().before(Calendar.getInstance().getTime())) {
             setState(BatchState.EXPIRED);
         }
@@ -70,14 +72,15 @@ public class Batch {
             throw new CouponManagementException("BATCH_EXHAUSTED", "batch empty - cant grant coupons");
         }
         if(this.getStartTime().after(Calendar.getInstance().getTime())) {
-            throw new CouponManagementException("NATCH_NOT_STARTED","start time not yet reached = please come back later for coupons ");
+            throw new CouponManagementException("NATCH_NOT_STARTED","start time not yet reached : please come back later for coupons ");
         }
         synchronized (this.coupons) {
-            res = coupons.entrySet().iterator().next().getValue();
-            coupons.remove(res.getId());
-            System.out.println("removed coupon with id : "+res.getId()+" batch : "+id);
+            res = coupons.keySet().iterator().next();
+            cToRet = coupons.get(res);
+            coupons.remove(res);
+            //System.out.println("removed coupon with id : "+res+" batch : "+id);
         }
-        return res;
+        return cToRet;
 
     }
 

@@ -13,7 +13,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CouponManagementSystem {
     private Map<Integer, Batch> batchById;
 
-    public CouponManagementSystem() {
+    private static final CouponManagementSystem INSTANCE = new CouponManagementSystem();
+
+    public static CouponManagementSystem getInstance() {
+        return CouponManagementSystem.INSTANCE;
+    }
+
+    private CouponManagementSystem() {
         batchById = new ConcurrentHashMap<Integer, Batch>();
     }
 
@@ -22,7 +28,7 @@ public class CouponManagementSystem {
             validateBatch(batchId, batchType, startTime, endTime, distributor, couponType, worth, maxAllowedGrants);
         } catch (CouponManagementException e) {
             //System.out.println("Error in batch creation : "+e.getErrorCode());
-            throw new CouponManagementException("INVALID_BATCH","Invalid batch creation request received", e);
+            throw new CouponManagementException("INVALID_BATCH",e.getMessage()+ " batch id : "+batchId, e);
         }
 
         Batch batch = new Batch(batchId, batchType, startTime, endTime, distributor, couponType, worth, maxAllowedGrants);
